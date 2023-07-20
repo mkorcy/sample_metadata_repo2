@@ -1,0 +1,27 @@
+name: Sync Metadata
+
+on:
+  push:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Prepare the metadata file
+        run: |
+          mkdir "${{ github.event.repository.name }}"
+          cp metadata.json "${{ github.event.repository.name }}/metadata.json"
+      - name: Push to another repo
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          target-directory: "${{ github.event.repository.name }}"
+          source-directory: '${{ github.event.repository.name }}'
+          destination-github-username: '${{ vars.USER }}'
+          destination-repository-name: '${{ vars.DESTINATION_REPO }}'
+          user-email: '${{ vars.EMAIL }}'
+          commit-message: 'Update metadata from ${{ github.repository }}'
